@@ -1,53 +1,30 @@
-Connect to Cassandra with DSE with SSL.
+Wide Row example
 ========================================================
 
-This is a simple example of setting up cassandra (dse version) with ssl client to encryption. It uses a simple 
-To setup dse to use SSL we need to follow the steps in the following url
+This is a simple example of using the wide row feature in Cassandra. It also shows how to use batching in Cassandra 1.2 and asynchronous requests with the Java driver.
 
-http://www.datastax.com/docs/datastax_enterprise3.1/security/ssl_transport#ssl-transport
+## Running the demo 
 
-The steps are summarised below.
+You will need a java runtime (preferably 7) along with maven 3 to run this demo. Start DSE 3.1.X or a cassandra 1.2.X instance on your local machine. This demo just runs as a standalone process on the localhost.
 
-The following commands were used to create the keystore and the truststore.
+This demo uses quite a lot of memory so it is worth setting the MAVEN_OPTS to run maven with more memory
 
-    keytool -genkey -alias localhost -keyalg RSA -keystore .keystore
+    export MAVEN_OPTS=-Xmx512M
 
-    keytool -export -alias localhost -file localhost.cer -keystore .keystore
+## Schema Setup
+Note : This will drop the keyspace "datastax_widerow_demo" and create a new one. All existing data will be lost. 
 
-    keytool -import -v -trustcacerts -alias localhost -file localhost.cer -keystore .truststore
+To specify contact points use the contactPoints command line parameter e.g. '-DcontactPoints=192.168.25.100,192.168.25.101'
+The contact points can take mulitple points in the IP,IP,IP (no spaces).
 
+To create the a single node cluster with replication factor of 1 for standard localhost setup, run the following
 
-I have included the keystore and truststore from the example. The passwords for these are both password1.
+    mvn clean compile exec:java -Dexec.mainClass="com.datastax.demo.SchemaSetupSingle"
 
-Update the client_encryption_details in the cassandra.yaml 
+To create the a multi data center cluster for DSE with a standard Cassandra, Analytics and Solr set up run the following
 
-    client_encryption_options:
-    enabled: true
-    keystore: /Users/patcho/dev/datastax-ssl-example/src/main/resources/keystore
-    keystore_password: password1
+    mvn clean compile exec:java -Dexec.mainClass="com.datastax.demo.SchemaSetupMulti" 
 
-The client using the default Java System properties for SSL so, pass the following properties 
-when running the ClusterConnect class. 
-    
-    -Djavax.net.ssl.trustStore=/Users/patcho/dev/datastax-ssl-example/src/main/resources/truststore -Djavax.net.ssl.trustStorePassword=password1
+To run the insert
 
-Troubleshooting
-================
-
-There is a bug in the Java security jars which may result in the error that needs new jars.
-Cannot support TLS_RSA_WITH_AES_256_CBC_SHA with currently installed providers
-
-Fix detailed here -  
-http://www.pathin.org/tutorials/java-cassandra-cannot-support-tls_rsa_with_aes_256_cbc_sha-with-currently-installed-providers/
-
-    e.g. For MAC
-    Install jars from
-    http://www.oracle.com/technetwork/java/javase/downloads/jce-7-download-432124.html
-    to 
-    /Library/Java/JavaVirtualMachines/<JAVA_VERSION/Contents/Home/jre/lib/security
-    e.g.
-    /Library/Java/JavaVirtualMachines/jdk1.7.0_40.jdk/Contents/Home/jre/lib/security
-
-If you get a NoHostAvailable Exception and you know for sure your cluster is up, 
-then the problem is probably the system properties that are being sent in.
-
+    mvn clean compile exec:java -Dexec.mainClass="com.datastax.widerow.Main"
