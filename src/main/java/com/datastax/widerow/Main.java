@@ -43,37 +43,13 @@ public class Main {
 
 		int rowSize = Integer.parseInt(noOfRowsStr);
 		int colSize = Integer.parseInt(noOfColsStr);
-		
-		this.insertWideRows(rowSize, colSize);
+				
 		this.insertWideRowsAsync(rowSize, colSize);
 		this.insertWideRowsBatch(rowSize, colSize);		
 
 		System.out.println("Wide row test finished.");
 
 		cluster.shutdown();
-	}
-
-	private void insertWideRows(int rowSize, int colSize) {
-		BoundStatement boundStmt = new BoundStatement(insertStmt);
-
-		int count=0;
-		long start = System.currentTimeMillis();
-		
-		for (int i = 0; i < rowSize; i++) {
-			for (int j = 0; j < colSize; j++) {
-
-				boundStmt.bind("id-" + (i+1), UUID.randomUUID(), "Name " + (j+1));
-				session.execute(boundStmt);
-			}
-			
-			count++;
-			
-			if (count % 100 == 0){
-				Log.info("Inserted " + count + " rows");
-			}
-		}
-
-		Log.info("Inserted " + colSize + " columns for " + rowSize + " rows in " + (System.currentTimeMillis() - start) + "ms");
 	}
 	
 	private void insertWideRowsAsync(int rowSize, int colSize) {
@@ -84,10 +60,14 @@ public class Main {
 		long start = System.currentTimeMillis();
 		
 		for (int i = 0; i < rowSize; i++) {
-			for (int j = 0; j < colSize; j++) {
+			for (int j = 1; j < (colSize+1); j++) {
 
 				boundStmt.bind("id-" + (i+1), UUID.randomUUID(), "Name " + (j+1));
 				results.add(session.executeAsync(boundStmt));
+				
+				if (j % 10000 == 0 && j > 0){
+					Log.info("Inserted " + j + " cols");
+				}
 			}
 			
 			count++;
@@ -96,14 +76,16 @@ public class Main {
 				Log.info("Inserted " + count + " rows");
 			}
 		}
-
-		int doneCount = rowSize;
 		
-		while(doneCount > 0){
-			for (ResultSetFuture result : results){
-				if (result.isDone()){
-					doneCount --;
-				}
+		boolean wait = true;
+		while(wait){			
+			//start with getting out, if any results are not done, wait is true.
+			wait = false;			
+			for (ResultSetFuture result : results){				
+				if (!result.isDone()){
+					wait = true;
+					break;
+				}			
 			}
 		}
 		
@@ -115,7 +97,10 @@ public class Main {
 		int count=0;
 		long start = System.currentTimeMillis();
 		
-		
+		if (colSize > 1500){
+			Log.info("ColSize too big for Batch statement");
+			return;
+		}
 		
 		for (int i = 0; i < rowSize; i++) {
 			
