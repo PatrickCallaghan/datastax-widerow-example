@@ -9,7 +9,7 @@ public class SchemaSetupMulti extends SchemaSetup {
 		
 		String keyspace = PropertyHelper.getProperty("keyspace", "datastax_widerow_demo");
 		
-		DROP_KEYSPACE = "Drop keyspace " +keyspace;
+		DROP_KEYSPACE = "Drop keyspace " +keyspace;	
 		CREATE_KEYSPACE = "CREATE KEYSPACE " + keyspace + " WITH replication = "
 				+ "{'class' : 'NetworkTopologyStrategy', 'Cassandra' : 3, 'Analytics' : 1, 'Solr' : 1}";
 		

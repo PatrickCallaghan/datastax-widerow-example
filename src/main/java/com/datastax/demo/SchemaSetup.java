@@ -33,7 +33,6 @@ public abstract class SchemaSetup {
 		//Sleep to allow for changes to be propagted.
 		sleep(1000);
 
-		LOG.info("Running : " + CREATE_KEYSPACE);
 		this.run(CREATE_KEYSPACE);
 		
 		this.runfile();		

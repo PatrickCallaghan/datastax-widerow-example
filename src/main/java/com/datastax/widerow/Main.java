@@ -36,7 +36,7 @@ public class Main {
 		insertStmt = session.prepare(INSERT_INTO_FOLLOWERS);
 		queryStmt = session.prepare(SELECT_FROM_FOLLOWERS);
 
-		String noOfRowsStr = PropertyHelper.getProperty("noOfRows", "5000");
+		String noOfRowsStr = PropertyHelper.getProperty("noOfRows", "500");
 		String noOfColsStr = PropertyHelper.getProperty("noOfCols", "100");
 
 		System.out.println("Cluster and Session created.");
