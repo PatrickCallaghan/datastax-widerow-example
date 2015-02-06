@@ -14,9 +14,12 @@ import com.datastax.driver.core.Cluster;
 import com.datastax.driver.core.PreparedStatement;
 import com.datastax.driver.core.ResultSetFuture;
 import com.datastax.driver.core.Session;
+import com.datastax.driver.core.policies.DefaultRetryPolicy;
+import com.datastax.driver.core.policies.LoggingRetryPolicy;
 
 public class Test {
 
+	private static final int NO_OR_ROWS = 50000;
 	private Logger logger = LoggerFactory.getLogger(Test.class);
 	private Session session;
 
@@ -31,17 +34,20 @@ public class Test {
 
 		String contactPointsStr = PropertyHelper.getProperty("contactPoints", "localhost");
 		
-		Cluster cluster = Cluster.builder().addContactPoints(contactPointsStr.split(",")).build();
+		Cluster cluster = Cluster.builder()
+				.addContactPoints(contactPointsStr.split(","))
+				.withRetryPolicy(new LoggingRetryPolicy(DefaultRetryPolicy.INSTANCE))
+				.build();
 		this.session = cluster.connect();
 
 		insertStmt = session.prepare(insert);
-		System.out.println("Cluster and Session created.");
+		logger.info("Cluster and Session created.");
 
 		Timer timer = new Timer();
 		timer.start();
-		insertWideRowsAsync(50000);	
+		insertWideRowsAsync(NO_OR_ROWS);	
 		timer.end();
-		System.out.println("Wide row test finished in " + timer.getTimeTakenMinutes() + " mins");		
+		logger.info("Wide row test finished in " + timer.getTimeTakenSeconds() + " secs" + (NO_OR_ROWS/timer.getTimeTakenSeconds()) + " a sec");		
 
 		session.close();
 		cluster.close();

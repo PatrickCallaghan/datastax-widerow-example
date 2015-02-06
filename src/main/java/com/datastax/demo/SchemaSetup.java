@@ -11,7 +11,7 @@ import com.datastax.driver.core.exceptions.InvalidQueryException;
 
 public abstract class SchemaSetup {
 
-	static private Logger logger = LoggerFactory.getLogger(SchemaSetup.class);
+	protected static Logger logger = LoggerFactory.getLogger(SchemaSetup.class);
 	static String CREATE_KEYSPACE;
 	static String DROP_KEYSPACE;
 
@@ -64,7 +64,7 @@ public abstract class SchemaSetup {
 		try {
 			run(cql);
 		} catch (InvalidQueryException e) {
-			logger.log(Level.WARNING, "Ignoring exception - " + e.getMessage());
+			logger.error("Ignoring exception - " + e.getMessage());
 		}
 	}
 
