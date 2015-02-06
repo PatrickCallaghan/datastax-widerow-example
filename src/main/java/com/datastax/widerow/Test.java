@@ -47,7 +47,7 @@ public class Test {
 		timer.start();
 		insertWideRowsAsync(NO_OR_ROWS);	
 		timer.end();
-		logger.info("Wide row test finished in " + timer.getTimeTakenSeconds() + " secs" + (NO_OR_ROWS/timer.getTimeTakenSeconds()) + " a sec");		
+		logger.info("Wide row test finished in " + timer.getTimeTakenSeconds() + " secs (" + (NO_OR_ROWS/timer.getTimeTakenSeconds()) + " a sec)");		
 
 		session.close();
 		cluster.close();
