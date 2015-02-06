@@ -29,4 +29,5 @@ To run the insert
 
     mvn clean compile exec:java -Dexec.mainClass="com.datastax.widerow.Main"
 
-
+Or
+    mvn clean compile exec:java -Dexec.mainClass="com.datastax.widerow.Main" -DnoOfRows=10 -DnoOfCols=1000
