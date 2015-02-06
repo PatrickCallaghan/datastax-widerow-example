@@ -67,9 +67,14 @@ public class Test {
 			
 			count++;
 			
-			if (count % 10 == 0){
+			if (count % 5 == 0){
 				logger.info("Inserted " + count + " rows");
 				
+				try {
+					Thread.sleep(10);
+				} catch (InterruptedException e1) {
+					e1.printStackTrace();
+				}
 				boolean wait = true;
 				while(wait){			
 					//start with getting out, if any results are not done, wait is true.
