@@ -13,11 +13,11 @@ public class SchemaSetupSingle extends SchemaSetup {
 		CREATE_KEYSPACE = "CREATE KEYSPACE " + keyspace + " WITH replication = "
 				+ "{'class' : 'SimpleStrategy', 'replication_factor' : 1}";
 		
-		LOG.info ("Running Single Node DSE setup.");
+		logger.info ("Running Single Node DSE setup.");
 		
 		internalSetup();
 		
-		LOG.info ("Finished Single Node DSE setup.");
+		logger.info ("Finished Single Node DSE setup.");
 	}
 
 	public static void main(String args[]){

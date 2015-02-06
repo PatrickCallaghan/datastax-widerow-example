@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 
-import org.mortbay.log.Log;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,7 +57,8 @@ public class Main {
 		timer.end();
 		System.out.println("Wide row test finished in " + timer.getTimeTakenMinutes() + " mins");		
 
-		cluster.shutdown();
+		session.close();
+		cluster.close();
 	}
 	
 	private void insertWideRowsAsync(int rowSize, int colSize) {
@@ -75,14 +75,14 @@ public class Main {
 				results.add(session.executeAsync(boundStmt));
 				
 				if (j % 10000 == 0 && j > 0){
-					Log.info("Inserted " + j + " cols");
+					logger.info("Inserted " + j + " cols");
 				}
 			}
 			
 			count++;
 			
 			if (count % 100 == 0){
-				Log.info("Inserted " + count + " rows");
+				logger.info("Inserted " + count + " rows");
 			}
 		}
 		
@@ -107,7 +107,7 @@ public class Main {
 			}
 		}
 		
-		Log.info("Inserted (Async) " + colSize + " columns for " + rowSize + " rows in " + (System.currentTimeMillis() - start) + "ms");
+		logger.info("Inserted (Async) " + colSize + " columns for " + rowSize + " rows in " + (System.currentTimeMillis() - start) + "ms");
 	}
 
 	private void insertWideRowsBatch(int rowSize, int colSize) {
@@ -116,7 +116,7 @@ public class Main {
 		long start = System.currentTimeMillis();
 		
 		if (colSize > 1500){
-			Log.info("ColSize too big for Batch statement");
+			logger.info("ColSize too big for Batch statement");
 			return;
 		}
 		
@@ -147,11 +147,11 @@ public class Main {
 			count++;
 			
 			if (count % 100 == 0){
-				Log.info("Inserted " + count + " rows");
+				logger.info("Inserted " + count + " rows");
 			}
 		}
 
-		Log.info("Inserted (Batch) " + colSize + " columns for " + rowSize + " rows in " + (System.currentTimeMillis() - start) + "ms");
+		logger.info("Inserted (Batch) " + colSize + " columns for " + rowSize + " rows in " + (System.currentTimeMillis() - start) + "ms");
 	}
 
 	/**

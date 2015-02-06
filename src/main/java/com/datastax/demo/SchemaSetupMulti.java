@@ -13,10 +13,10 @@ public class SchemaSetupMulti extends SchemaSetup {
 		CREATE_KEYSPACE = "CREATE KEYSPACE " + keyspace + " WITH replication = "
 				+ "{'class' : 'NetworkTopologyStrategy', 'Cassandra' : 3, 'Analytics' : 1, 'Solr' : 1}";
 		
-		LOG.info ("Starting Multi Center DSE setup.");
+		logger.info ("Starting Multi Center DSE setup.");
 
 		this.internalSetup();
-		LOG.info ("Finished Multi Center DSE setup.");
+		logger.info ("Finished Multi Center DSE setup.");
 	}
 
 

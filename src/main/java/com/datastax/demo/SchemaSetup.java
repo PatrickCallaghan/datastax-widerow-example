@@ -1,7 +1,8 @@
 package com.datastax.demo;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 import com.datastax.demo.utils.FileUtils;
 import com.datastax.driver.core.Cluster;
@@ -10,7 +11,7 @@ import com.datastax.driver.core.exceptions.InvalidQueryException;
 
 public abstract class SchemaSetup {
 
-	static final Logger LOG = Logger.getLogger("SchemaSetup");
+	static private Logger logger = LoggerFactory.getLogger(SchemaSetup.class);
 	static String CREATE_KEYSPACE;
 	static String DROP_KEYSPACE;
 
@@ -63,12 +64,12 @@ public abstract class SchemaSetup {
 		try {
 			run(cql);
 		} catch (InvalidQueryException e) {
-			LOG.log(Level.WARNING, "Ignoring exception - " + e.getMessage());
+			logger.log(Level.WARNING, "Ignoring exception - " + e.getMessage());
 		}
 	}
 
 	void run(String cql){
-		LOG.info("Running : " + cql);
+		logger.info("Running : " + cql);
 		session.execute(cql);
 	}
 
@@ -81,7 +82,7 @@ public abstract class SchemaSetup {
 
 	
 	void shutdown() {
-		session.shutdown();
-		cluster.shutdown();
+		session.close();
+		cluster.close();
 	}
 }

@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
-import org.mortbay.log.Log;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,7 +43,8 @@ public class Test {
 		timer.end();
 		System.out.println("Wide row test finished in " + timer.getTimeTakenMinutes() + " mins");		
 
-		cluster.shutdown();
+		session.close();
+		cluster.close();
 	}
 	
 	private void insertWideRowsAsync(int noOfRows) {
@@ -62,7 +62,7 @@ public class Test {
 			count++;
 			
 			if (count % 10 == 0){
-				Log.info("Inserted " + count + " rows");
+				logger.info("Inserted " + count + " rows");
 				
 				boolean wait = true;
 				while(wait){			
