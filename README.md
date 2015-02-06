@@ -28,3 +28,5 @@ To create the a multi data center cluster for DSE with a standard Cassandra, Ana
 To run the insert
 
     mvn clean compile exec:java -Dexec.mainClass="com.datastax.widerow.Main"
+
+

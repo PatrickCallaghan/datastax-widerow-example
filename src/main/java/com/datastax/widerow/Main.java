@@ -3,10 +3,14 @@ package com.datastax.widerow;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.ExecutionException;
 
 import org.mortbay.log.Log;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.datastax.demo.utils.PropertyHelper;
+import com.datastax.demo.utils.Timer;
 import com.datastax.driver.core.BoundStatement;
 import com.datastax.driver.core.Cluster;
 import com.datastax.driver.core.PreparedStatement;
@@ -15,6 +19,7 @@ import com.datastax.driver.core.Session;
 
 public class Main {
 
+	private Logger logger = LoggerFactory.getLogger(Main.class);
 	private Session session;
 	private static String keyspaceName = "datastax_widerow_demo";
 	private static String tableName = keyspaceName + ".followers";
@@ -43,11 +48,15 @@ public class Main {
 
 		int rowSize = Integer.parseInt(noOfRowsStr);
 		int colSize = Integer.parseInt(noOfColsStr);
-				
+
+		Timer timer = new Timer();
+		timer.start();
+		
 		this.insertWideRowsAsync(rowSize, colSize);
 		this.insertWideRowsBatch(rowSize, colSize);		
 
-		System.out.println("Wide row test finished.");
+		timer.end();
+		System.out.println("Wide row test finished in " + timer.getTimeTakenMinutes() + " mins");		
 
 		cluster.shutdown();
 	}
@@ -62,7 +71,7 @@ public class Main {
 		for (int i = 0; i < rowSize; i++) {
 			for (int j = 1; j < (colSize+1); j++) {
 
-				boundStmt.bind("id-" + (i+1), UUID.randomUUID(), "Name " + (j+1));
+				boundStmt.bind("id-async-" + (i+1), UUID.randomUUID(), "Name " + (j+1));
 				results.add(session.executeAsync(boundStmt));
 				
 				if (j % 10000 == 0 && j > 0){
@@ -81,7 +90,16 @@ public class Main {
 		while(wait){			
 			//start with getting out, if any results are not done, wait is true.
 			wait = false;			
-			for (ResultSetFuture result : results){				
+			for (ResultSetFuture result : results){
+				
+				try {
+					result.get();
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				} catch (ExecutionException e) {
+					e.printStackTrace();
+				}
+				
 				if (!result.isDone()){
 					wait = true;
 					break;
@@ -113,7 +131,7 @@ public class Main {
 				batchStmt.append(this.INSERT_INTO_FOLLOWERS);
 				batchStmt.append("\n");
 			
-				bindingsList.add("id-" + (i+1));
+				bindingsList.add("id-batch-" + (i+1));
 				bindingsList.add(UUID.randomUUID());
 				bindingsList.add("Name " + (j+1));
 								
